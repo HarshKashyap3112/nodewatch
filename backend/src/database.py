@@ -12,15 +12,41 @@ if sys.platform == "win32":
     except Exception:
         pass
 
+def normalize_database_url(url: str) -> str:
+    url = url.strip()
+    if url.startswith("mysql://"):
+        url = "mysql+aiomysql://" + url[len("mysql://"):]
+    elif url.startswith("mysql+pymysql://"):
+        url = "mysql+aiomysql://" + url[len("mysql+pymysql://"):]
+    elif url.startswith("postgres://"):
+        url = "postgresql+asyncpg://" + url[len("postgres://"):]
+    elif url.startswith("postgresql://"):
+        url = "postgresql+asyncpg://" + url[len("postgresql://"):]
+
+    # TiDB Cloud: rewrite /sys to /test if accidentally specified (sys is reserved for system metrics)
+    if "/sys?" in url:
+        url = url.replace("/sys?", "/test?", 1)
+    elif url.endswith("/sys"):
+        url = url[:-4] + "/test"
+
+    # Strip literal <CA_PATH> placeholders from connection strings
+    if "<CA_PATH>" in url or "<ca_path>" in url.lower():
+        url = url.split("?")[0]
+
+    return url
+
+
+db_url = normalize_database_url(settings.DATABASE_URL)
+
 # Engine configuration handles MySQL (aiomysql) and SQLite fallback (aiosqlite)
 connect_args = {}
-if settings.DATABASE_URL.startswith("sqlite"):
+if db_url.startswith("sqlite"):
     connect_args["check_same_thread"] = False
-elif "tidbcloud.com" in settings.DATABASE_URL or "ssl" in settings.DATABASE_URL.lower():
+elif "tidbcloud.com" in db_url or "ssl" in db_url.lower():
     connect_args["ssl"] = ssl.create_default_context()
 
 engine = create_async_engine(
-    settings.DATABASE_URL,
+    db_url,
     echo=False,
     connect_args=connect_args,
     pool_pre_ping=True,

@@ -21,8 +21,12 @@ logger = logging.getLogger("smp_backend")
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("Initializing Database Tables...")
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    try:
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+        logger.info("Database tables verified successfully.")
+    except Exception as e:
+        logger.error(f"Database initialization error: {e}", exc_info=True)
 
     logger.info("Launching Scheduler Background Task...")
     scheduler_task = asyncio.create_task(scheduler_loop())
