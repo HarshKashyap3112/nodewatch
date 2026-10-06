@@ -1,0 +1,16 @@
+{
+    "server_url": "http://localhost:8000",
+    "api_key": "smp_C1wsxVREilKjsOLXGTM3LvmGXoX5YqbrAjWjRtbspWE",
+    "interval": 30,
+    "buffer_db_path": "agent_buffer.db",
+    "process_checks": [
+        "nginx",
+        "mysqld",
+        "docker"
+    ],
+    "port_checks": [
+        80,
+        443,
+        3306
+    ]
+}
