@@ -1,18 +1,26 @@
 from datetime import datetime
-from typing import Optional
-from pydantic import BaseModel, ConfigDict, EmailStr, Field
+from typing import Annotated, Optional
+from pydantic import BaseModel, ConfigDict, Field
 from src.auth.constants import UserRole
+
+EmailType = Annotated[
+    str,
+    Field(
+        pattern=r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$",
+        description="Email address"
+    )
+]
 
 
 class RegisterIn(BaseModel):
-    email: EmailStr
+    email: EmailType
     password: str = Field(..., min_length=6)
     full_name: Optional[str] = None
     role: UserRole = UserRole.OWNER
 
 
 class LoginIn(BaseModel):
-    email: EmailStr
+    email: EmailType
     password: str
 
 
@@ -25,7 +33,7 @@ class UserOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: str
-    email: EmailStr
+    email: EmailType
     full_name: Optional[str] = None
     role: UserRole
     created_at: datetime
@@ -38,7 +46,7 @@ class UserUpdateIn(BaseModel):
 
 
 class ResetPasswordIn(BaseModel):
-    email: EmailStr
+    email: EmailType
     reset_secret_key: str
     new_password: str = Field(..., min_length=6)
 

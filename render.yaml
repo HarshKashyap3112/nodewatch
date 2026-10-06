@@ -8,7 +8,7 @@ services:
     plan: free
     rootDir: backend
 
-    buildCommand: pip install -r requirements/base.txt
+    buildCommand: pip install -r requirements.txt
 
     startCommand: uvicorn src.main:app --host 0.0.0.0 --port $PORT
 
