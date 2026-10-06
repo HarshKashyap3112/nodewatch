@@ -5,7 +5,6 @@ services:
   - type: web
     name: nodewatch-backend
     env: python
-    region: oregon
     plan: free
     rootDir: backend
     buildCommand: pip install -r requirements/base.txt
@@ -33,7 +32,6 @@ services:
   - type: web
     name: nodewatch-frontend
     env: static
-    region: oregon
     plan: free
     rootDir: frontend
     buildCommand: npm install && npm run build
