@@ -38,7 +38,8 @@ export const AddServerModal: React.FC<AddServerModalProps> = ({ isOpen, onClose,
 
   const getAgentCommand = () => {
     if (!createdResult) return '';
-    return `python agent/main.py --server http://localhost:8000 --api-key ${createdResult.api_key.raw_api_key} --interval 30`;
+    const serverUrl = (import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1').replace(/\/api\/v1\/?$/, '');
+    return `python agent/main.py --server ${serverUrl} --api-key ${createdResult.api_key.raw_api_key} --interval 30`;
   };
 
   const copyToClipboard = () => {
